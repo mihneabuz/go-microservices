@@ -12,3 +12,11 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
