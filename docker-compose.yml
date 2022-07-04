@@ -2,6 +2,14 @@ version: '3'
 
 services:
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+
   broker-service:
     build:
       context: ./broker-service
@@ -13,10 +21,27 @@ services:
       mode: replicated
       replicas: 1
 
-  frontend:
+  auth-service:
     build:
-      context: ./frontend
+      context: ./auth-service
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3000:3000"
+      - "3002:3002"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=postgres dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+
+  postgres:
+    image: 'postgres:latest'
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    volumes:
+      - ./data/postgres/:/val/lib/postgresql/data/
