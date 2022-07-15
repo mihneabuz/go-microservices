@@ -14,7 +14,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-const port = "3002"
+const port = "80"
 const maxTries = 16
 
 type Config struct {

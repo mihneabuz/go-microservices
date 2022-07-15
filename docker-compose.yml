@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3002:3002"
+      - "3002:80"
     deploy:
       mode: replicated
       replicas: 1
