@@ -1,5 +1,5 @@
 
-build: frontend broker auth
+build: frontend broker auth logger
 
 frontend:
 	cd frontend && env CGO_ENABLED=0 go build ./cmd/web
@@ -9,6 +9,9 @@ broker:
 
 auth:
 	cd auth-service && env CGO_ENABLED=0 go build ./cmd/api
+
+logger:
+	cd logger-service && env CGO_ENABLED=0 go build ./cmd/api
 
 start: build
 	docker-compose up --build

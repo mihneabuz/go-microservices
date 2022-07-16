@@ -47,3 +47,28 @@ services:
       POSTGRES_DB: users
     volumes:
       - ./data/postgres/:/val/lib/postgresql/data/
+
+  logger-service:
+    build:
+      context: ./logger-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3003:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    links:
+      - mongo
+
+  mongo:
+    image: 'mongo:latest'
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+    volumes:
+      - ./data/mongo/:/data/db
+    command: mongod --quiet --logpath /dev/null
