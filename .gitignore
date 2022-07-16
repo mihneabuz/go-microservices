@@ -3,4 +3,5 @@ frontend/web
 broker-service/api
 auth-service/api
 logger-service/api
+mail-service/api
 data

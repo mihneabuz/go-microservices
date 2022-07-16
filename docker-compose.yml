@@ -8,7 +8,8 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3000:3000"
+      - '3000:3000'
+
 
   broker-service:
     build:
@@ -16,10 +17,15 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3001:3001"
+      - '3001:3001'
     deploy:
       mode: replicated
       replicas: 1
+    links:
+      - auth-service
+      - logger-service
+      - mail-service
+
 
   auth-service:
     build:
@@ -27,12 +33,12 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3002:80"
+      - '3002:80'
     deploy:
       mode: replicated
       replicas: 1
     environment:
-      DSN: "host=postgres port=5432 user=postgres password=postgres sslmode=disable timezone=UTC connect_timeout=5"
+      DSN: 'host=postgres port=5432 user=postgres password=postgres sslmode=disable timezone=UTC connect_timeout=5'
     links:
       - postgres
 
@@ -40,7 +46,7 @@ services:
     image: 'postgres:latest'
     restart: always
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -48,13 +54,14 @@ services:
     volumes:
       - ./data/postgres/:/val/lib/postgresql/data/
 
+
   logger-service:
     build:
       context: ./logger-service
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3003:80"
+      - '3003:80'
     deploy:
       mode: replicated
       replicas: 1
@@ -64,7 +71,7 @@ services:
   mongo:
     image: 'mongo:latest'
     ports:
-      - "27017:27017"
+      - '27017:27017'
     environment:
       MONGO_INITDB_DATABASE: logs
       MONGO_INITDB_ROOT_USERNAME: mongo
@@ -72,3 +79,32 @@ services:
     volumes:
       - ./data/mongo/:/data/db
     command: mongod --quiet --logpath /dev/null
+
+
+  mail-service:
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '3004:80'
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MAIL_DOMAIN: localhost
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: none
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_NAME: "Ion Vasile"
+      MAIL_ADDRESS: "ion.vasile@test.com"
+    links:
+      - mailhog
+
+  mailhog:
+    image: 'mailhog/mailhog:latest'
+    ports:
+      - '1025:1025'
+      - '8025:8025'
