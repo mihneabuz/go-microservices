@@ -2,4 +2,5 @@ course
 frontend/web
 broker-service/api
 auth-service/api
+logger-service/api
 data
