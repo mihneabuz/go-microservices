@@ -11,7 +11,6 @@ type payload struct {
 }
 
 func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
-	// read json into var
 	var requestPayload payload
 	_ = app.readJSON(w, r, &requestPayload)
 
