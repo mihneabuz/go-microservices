@@ -132,6 +132,7 @@ services:
       replicas: 1
     volumes:
       - ./data/rabbitmq/:/var/lib/rabbitmq/
+    command: rabbitmq-server > /dev/null
 
 
 
