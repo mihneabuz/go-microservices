@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/rpc"
 	"strconv"
 )
 
@@ -63,7 +64,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 
 	case "log":
 		// app.logItem(w, requestPayload.Log)
-		app.logEvent(w, requestPayload.Log)
+		app.logItemRPC(w, requestPayload.Log)
+		// app.logEvent(w, requestPayload.Log)
 
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
@@ -148,6 +150,38 @@ func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 	payload.Message = "logged"
 
 	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) logItemRPC(w http.ResponseWriter, entry LogPayload) {
+	client, err := rpc.Dial("tcp", "logger-service:5001")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+
+	type RPCPayload struct {
+		Name string
+		Data string
+	}
+
+	rpcPayload := RPCPayload {
+		Name: entry.Name,
+		Data: entry.Data,
+	}
+
+	var result string
+	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	var resPayload response
+	resPayload.Error = false
+	resPayload.Message = "logged"
+
+	app.writeJSON(w, http.StatusAccepted, resPayload)
 }
 
 func (app *Config) sendMail(w http.ResponseWriter, payload MailPayload) {
