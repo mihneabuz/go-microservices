@@ -44,7 +44,7 @@
 		let received = document.getElementById("received")
 
 		brokerBtn.addEventListener("click", function () {
-			fetch("http:\/\/localhost:3001", { method: 'POST' })
+			fetch("{{print .BrokerUrl}}", { method: 'POST' })
 				.then(response => response.json())
 				.then(data => {
 					sent.innerHTML = "empty post request"
@@ -79,7 +79,7 @@
 				headers
 			}
 
-			fetch("http:\/\/localhost:3001/handle", args)
+			fetch("{{print .BrokerUrl "/handle"}}", args)
 				.then(response => { console.log(response); return response.json()})
 				.then(data => {
 					sent.innerHTML = JSON.stringify(payload, undefined, 4)
@@ -114,7 +114,7 @@
 				headers
 			}
 
-			fetch("http:\/\/localhost:3001/handle", args)
+			fetch("{{print .BrokerUrl "/handle"}}", args)
 				.then(response => { console.log(response); return response.json()})
 				.then(data => {
 					sent.innerHTML = JSON.stringify(payload, undefined, 4)
@@ -151,7 +151,7 @@
 				headers
 			}
 
-			fetch("http:\/\/localhost:3001/handle", args)
+			fetch("{{print .BrokerUrl "/handle"}}", args)
 				.then(response => { console.log(response); return response.json()})
 				.then(data => {
 					sent.innerHTML = JSON.stringify(payload, undefined, 4)

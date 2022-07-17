@@ -1,0 +1,106 @@
+version: '3'
+
+services:
+
+  caddy:
+    image: mihneabuz/test-caddy:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+  frontend:
+    image: mihneabuz/test-frontend:1.0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      BROKER_URL: 'http://backend'
+
+  broker-service:
+    image: mihneabuz/test-broker-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  auth-service:
+    image: mihneabuz/test-auth-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: 'host=postgres port=5432 user=postgres password=postgres sslmode=disable timezone=UTC connect_timeout=5'
+
+  listener-service:
+    image: mihneabuz/test-listener-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  logger-service:
+    image: mihneabuz/test-logger-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  mail-service:
+    image: mihneabuz/test-mail-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MAIL_DOMAIN: localhost
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: none
+      MAIL_USERNAME: ''
+      MAIL_PASSWORD: ''
+      MAIL_NAME: 'Ion Vasile'
+      MAIL_ADDRESS: 'ion.vasile@test.com'
+
+  rabbitmq:
+    image: 'rabbitmq:latest'
+    deploy:
+      mode: global
+
+  mailhog:
+    image: 'mailhog/mailhog:latest'
+    deploy:
+      mode: global
+    ports:
+      - '8025:8025'
+
+  mongo:
+    image: 'mongo:latest'
+    deploy:
+      mode: global
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+    volumes:
+      - ./data/mongo/:/data/db
+
+  postgres:
+    image: 'postgres:latest'
+    deploy:
+      mode: global
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    volumes:
+      - ./data/postgres/:/val/lib/postgresql/data/
+
+
+
+volumes:
+  caddy_data:
+    external: true
+
+  caddy_config:
